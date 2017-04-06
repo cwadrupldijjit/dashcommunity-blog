@@ -4,6 +4,7 @@ import { stateToMarkdown } from 'draft-js-export-markdown'
 import { stateFromMarkdown } from 'draft-js-import-markdown'
 import moment from 'moment'
 
+import * as auth from '../Auth'
 
 export const publish = (values) => {
     const { token, author, title, sample, overwrite } = values;
