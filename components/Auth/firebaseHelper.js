@@ -1,9 +1,9 @@
 import firebase from 'firebase';
 
-let token;
-let user;
+const localStorageAuthKey = 'dashcommunityBlogAuth';
+
 let provider;
-let credential;
+let authObj;
 
 let strategy = 'popup';
 
@@ -21,7 +21,7 @@ function gitHubRedirectLogin() {
 function gitHubPopupLogin() {
     provider = new firebase.auth.GithubAuthProvider();
     provider.addScope('repo');
-    firebase.auth()
+    return firebase.auth()
         .signInWithPopup(provider)
         .then(handleSigninSuccess)
         .catch(handleSignInErr);
@@ -47,36 +47,64 @@ function gitHubPopupLogin() {
 // }
 
 function getUser() {
-    if (user) {
-        return user;
+    if (!authObj) {
+        authObj = getAuthObj();
+    }
+    if (authObj && authObj.user) {
+        return authObj.user;
     }
 
     return false;
 }
 
 function getToken() {
-    if (token) {
-        return token;
+    if (!authObj) {
+        authObj = getAuthObj();
+    }
+    if (authObj && authObj.token) {
+        return authObj.token;
+    }
+
+    return false;
+}
+
+function setUsername(username) {
+    if (!authObj) {
+        authObj = getAuthObj();
+    }
+    if (authObj && authObj.user) {
+        authObj.user.username = username;
     }
 
     return false;
 }
 
 function handleSigninSuccess(result) {
+    if (!authObj) {
+        authObj = getAuthObj();
+    }
     if (result.credential) {
-        token = result.credential.accessToken;
-        credential = result.credential;
+        authObj.token = result.credential.accessToken;
+        authObj.credential = result.credential;
     }
 
-    user = result.user;
-    return user;
+    // fetch('github.com', )
+
+    authObj.user = result.user;
+    authObj.provider = provider;
+
+    window.localStorage.setItem(localStorageAuthKey, JSON.stringify(authObj));
+    return authObj.user;
 }
 
 function handleSignInErr(err) {
     const errorCode = err.code;
     const errorMessage = err.message;
     const email = err.email;
-    credential = err.credential;
+    if (!authObj) {
+        authObj = getAuthObj();
+    }
+    authObj.credential = err.credential;
 
     if (errorCode == 'auth/account-exists-with-different-credentials') {
         console.warn('You already signed up with a different ' +
@@ -89,10 +117,35 @@ function changeLoginStrategy(newStrategy) {
     strategy = newStrategy;
 }
 
+function getAuthObj() {
+    if (authObj) {
+        return authObj;
+    }
+    let obj;
+    const authString = localStorage.getItem(localStorageAuthKey);
+    if (authString) {
+        obj = JSON.parse(authString);
+    } else {
+        obj = {};
+    }
+    return obj;
+}
+
+function signOut() {
+    localStorage.removeItem(localStorageAuthKey);
+}
+
+function getLoginStrategy() {
+    return strategy;
+}
+
 export {
     gitHubRedirectLogin,
     gitHubPopupLogin,
     // emailLogin,
     getUser,
     getToken,
+    getAuthObj,
+    getLoginStrategy,
+    setUsername,
 };

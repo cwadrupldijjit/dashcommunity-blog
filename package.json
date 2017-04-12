@@ -10,7 +10,7 @@
     "copy": "find -E ./pages -regex '.*\\.(pdf|txt|png|jpg|jpeg|gif)$' -exec cp -v {} ./public ';'",
     "rebuild": "npm run clean ; npm run build ; npm run copy",
     "lint": "./node_modules/.bin/eslint --ext .js,.jsx --ignore-pattern public .",
-    "serve": "live-server --watch=./public --port=8400 ./public",
+    "serve": "live-server --watch=./public --port=8400 --host=localhost ./public",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "npm run clean; gatsby build --prefix-links; gh-pages -d public"
   },
