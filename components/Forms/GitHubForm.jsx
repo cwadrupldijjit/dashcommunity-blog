@@ -5,9 +5,13 @@ import 'bootstrap/dist/css/bootstrap.css'
 import { Select, Input, Checkbox, TextArea } from './FormElements'
 import { loadFromGitHub, saveToGitHub, publish } from './gitHubHelpers'
 import { loadFromLocalStorage, saveToLocalStorage } from './localStorageHelpers'
+import { auth } from '../Auth';
 
 let GitHubForm = (props) => {
-    const { handleSubmit, action, username, repo, path, file } = props;
+    let { username } = props;
+    const { handleSubmit, action, repo, path, file } = props;
+
+    username = username || auth.getUsername();
 
     let submitFn = () => {};
     let submitText = '';
@@ -44,7 +48,7 @@ let GitHubForm = (props) => {
             submitFn = loadFromGitHub;
             submitText = 'Load from GitHub';
             message = ['load', `github.com/${username}/${repo}/${path}/${file}`, 'the editor above']
-            showFields(formFields, 'username', 'repo', 'path', 'file', 'token', 'message', 'button')
+            showFields(formFields, 'username', 'repo', 'path', 'file', 'message', 'button')
             break;
 
         case 'save-ls':
@@ -68,7 +72,6 @@ let GitHubForm = (props) => {
                 'repo',
                 'path',
                 'file',
-                'token',
                 'overwrite',
                 'message',
                 'button');
@@ -82,7 +85,6 @@ let GitHubForm = (props) => {
                 'author',
                 'title',
                 'excerpt',
-                'token',
                 'overwrite',
                 'message',
                 'button')
@@ -99,6 +101,7 @@ let GitHubForm = (props) => {
             labelText: 'User',
             name: 'username',
             placeholder: 'Your GitHub User or Org name (e.g. "riongull", "dashcommunity")',
+            value: username,
         },
         {
             component: Input,
@@ -203,8 +206,7 @@ GitHubForm = reduxForm({
 
 export default GitHubForm = connect((state) => {
     // const { initialValues } = state
-    const { action, username, token, repo, path, file, overwrite } =
-        formValueSelector('gitHubForm')(
+    const formValues = formValueSelector('gitHubForm')(
             state,
             'action',
             'username',
@@ -214,6 +216,9 @@ export default GitHubForm = connect((state) => {
             'file',
             'overwrite'
         );
+
+    const { action, username, token, repo, path, file, overwrite } = formValues;
     // add initialValues when initialValues reducer has been set up
+
     return { action, username, token, repo, path, file, overwrite };
 })(GitHubForm);

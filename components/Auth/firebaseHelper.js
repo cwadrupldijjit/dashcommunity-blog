@@ -74,9 +74,21 @@ function setUsername(username) {
     }
     if (authObj && authObj.user) {
         authObj.user.username = username;
+        return authObj.user.username;
     }
 
     return false;
+}
+
+function getUsername() {
+    if (!authObj) {
+        authObj = getAuthObj();
+    }
+    if (authObj && authObj.user) {
+        return authObj.user.username;
+    }
+
+    return '';
 }
 
 function handleSigninSuccess(result) {
@@ -94,7 +106,7 @@ function handleSigninSuccess(result) {
     authObj.provider = provider;
 
     window.localStorage.setItem(localStorageAuthKey, JSON.stringify(authObj));
-    return authObj.user;
+    return authObj;
 }
 
 function handleSignInErr(err) {
@@ -148,4 +160,5 @@ export {
     getAuthObj,
     getLoginStrategy,
     setUsername,
+    getUsername,
 };

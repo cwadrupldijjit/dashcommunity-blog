@@ -20,19 +20,16 @@ export const Select = (field) => {
   )
 }
 
-export const Input = (field) => {
-  // console.log(field);
-  return (
-    <div className="form-group row">
-      <label className="col-2 col-form-label" htmlFor={field.input.name}>
-        {field.labelText}
-      </label>
-      <div className="col-10">
-        <input className="form-control" {...field} {...field.input}/>
-      </div>
+export const Input = (field) => (
+  <div className="form-group row">
+    <label className="col-2 col-form-label" htmlFor={field.input.name}>
+      {field.labelText}
+    </label>
+    <div className="col-10">
+      <input className="form-control" {...field} {...field.input} />
     </div>
-  )
-}
+  </div>
+)
 
 export const Checkbox = (field) => {
   // console.log(field);
